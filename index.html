@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KASE Placement 2026 | MIS Executive Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&family=Noto+Serif+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --teal: #0e5774;
+            --gold: #E1AD01;
+            --bg: #f4f7f9;
+            --white: #ffffff;
+            --text: #0f172a;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Noto Sans', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 25px;
+            color: var(--text);
+        }
+
+        header {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-family: 'Noto Serif Condensed', serif;
+            color: var(--teal);
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        /* Executive Analytics Header */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--white);
+            padding: 24px;
+            border-radius: 16px;
+            border-bottom: 4px solid var(--gold);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .stat-card .value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-top: 8px;
+            font-family: 'Noto Serif Condensed', serif;
+        }
+
+        /* Analytics Main Panels */
+        .analytics-main {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .panel-wrapper {
+            background: var(--white);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            min-height: 380px;
+        }
+
+        .panel-header {
+            font-family: 'Noto Serif Condensed', serif;
+            color: var(--teal);
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--gold);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        /* District Audit Table */
+        .scroll-container {
+            max-height: 280px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Noto Serif Condensed', serif;
+        }
+
+        th {
+            background: var(--teal);
+            color: var(--white);
+            text-align: left;
+            padding: 12px;
+            font-size: 0.85rem;
+            position: sticky;
+            top: 0;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 1rem;
+        }
+
+        /* Collapsible Dropdown */
+        .collapse-btn {
+            width: 100%;
+            background: var(--teal);
+            color: white;
+            padding: 18px 25px;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Noto Serif Condensed', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .collapse-content {
+            display: none;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .collapse-content.active { display: block; }
+
+        /* Highlight for Experienced Candidates */
+        .highlight-row { background-color: #fff9c4 !important; }
+        
+        tr.clickable-row:hover {
+            background-color: #f1f5f9;
+            cursor: pointer;
+        }
+
+        /* Drill-Down Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 40px;
+            width: 90%;
+            max-width: 650px;
+            border-radius: 24px;
+            border-top: 10px solid var(--teal);
+        }
+
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 25px; }
+        .detail-item label { font-size: 0.75rem; color: var(--teal); font-weight: 800; text-transform: uppercase; }
+        .detail-item p { margin: 4px 0 0 0; font-size: 1.1rem; color: var(--text); }
+
+        #syncStatus { color: #22c55e; font-weight: bold; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+        .dot { height: 8px; width: 8px; background-color: #22c55e; border-radius: 50%; display: inline-block; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Placement Drive MIS Analytics</h1>
+        <div id="syncStatus"><span class="dot"></span> LIVE AUTO-SYNC ACTIVE</div>
+    </header>
+
+    <div class="analytics-grid">
+        <div class="stat-card"><h3>Registrations</h3><div class="value" id="totalReg">0</div></div>
+        <div class="stat-card"><h3>Verified Present</h3><div class="value" id="attendCount">0</div></div>
+        <div class="stat-card"><h3>Experienced Pool</h3><div class="value" id="expCount">0</div></div>
+        <div class="stat-card"><h3>PWD Support</h3><div class="value" id="pwdCount">0</div></div>
+    </div>
+
+    <div class="analytics-main">
+        <div class="panel-wrapper">
+            <div class="panel-header">Gender Demographics</div>
+            <div style="height: 300px;"><canvas id="genderChart"></canvas></div>
+        </div>
+
+        <div class="panel-wrapper">
+            <div class="panel-header">District Breakdown</div>
+            <div class="scroll-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>District Name</th>
+                            <th>Count</th>
+                            <th>Pool %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="districtTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <button class="collapse-btn" onclick="toggleCollapse()">
+        <span>CANDIDATE AUDIT PROFILE (CLICK ROW TO DRILL DOWN)</span>
+        <span id="arrow">▼</span>
+    </button>
+    <div id="candidateData" class="collapse-content">
+        <div style="overflow-x: auto;">
+            <table style="min-width: 1000px; table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th style="width: 15%">Registration ID</th>
+                        <th style="width: 25%">Full Name</th>
+                        <th style="width: 20%">District</th>
+                        <th style="width: 20%">Qualification</th>
+                        <th style="width: 20%">Emp Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="drillDownModal" class="modal" onclick="closeModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h2 id="mName" style="color: var(--teal); margin:0; font-family: 'Noto Serif Condensed', serif;">Candidate Profile</h2>
+            <div class="detail-grid" id="mDetails"></div>
+            <button onclick="closeModal()" style="margin-top:30px; padding:12px 24px; background:var(--teal); color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; text-transform: uppercase;">Dismiss Report</button>
+        </div>
+    </div>
+
+    <script>
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7yGVpCvEDWTV3-qKLCmnb_n5AO-wgu1-SjRZ7M5QbohrI2uy77q9qCwxGwwDV11HSebe146TZUeC-/pub?output=csv";
+        let genderChart, masterData;
+
+        function parseCSV(text) {
+            return text.split('\n').slice(1).filter(l => l.trim()).map(line => {
+                const res = []; let cell = '', inQuotes = false;
+                for (let char of line) {
+                    if (char === '"') inQuotes = !inQuotes;
+                    else if (char === ',' && !inQuotes) { res.push(cell.trim()); cell = ''; }
+                    else cell += char;
+                }
+                res.push(cell.trim()); return res;
+            });
+        }
+
+        async function refreshDashboard() {
+            const res = await fetch(`${CSV_URL}&t=${new Date().getTime()}`);
+            const data = parseCSV(await res.text());
+            masterData = data;
+            
+            document.getElementById('totalReg').innerText = data.length;
+            document.getElementById('attendCount').innerText = data.filter(r => r[31] && r[31].includes("PRESENT")).length;
+            document.getElementById('expCount').innerText = data.filter(r => r[19] === "Experienced").length;
+            document.getElementById('pwdCount').innerText = data.filter(r => r[29] === "Yes").length;
+
+            renderDistrictTable(data);
+            renderMasterTable(data);
+            renderGenderChart(data);
+        }
+
+        function renderDistrictTable(data) {
+            const counts = {};
+            data.forEach(r => { counts[r[13]] = (counts[r[13]] || 0) + 1; });
+            const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+            document.getElementById('districtTableBody').innerHTML = sorted.map(([name, count]) => `
+                <tr>
+                    <td>${name || 'Unspecified'}</td>
+                    <td><strong>${count}</strong></td>
+                    <td style="color:var(--gold)">${((count/data.length)*100).toFixed(1)}%</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderMasterTable(data) {
+            document.getElementById('tableBody').innerHTML = data.map((row, i) => `
+                <tr onclick="openModal(${i})" class="clickable-row ${row[19] === 'Experienced' ? 'highlight-row' : ''}">
+                    <td>${row[0]}</td>
+                    <td>${row[2]}</td>
+                    <td>${row[13]}</td>
+                    <td>${row[15]}</td>
+                    <td>${row[19]}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderGenderChart(data) {
+            const counts = {};
+            data.forEach(r => { counts[r[3]] = (counts[r[3]] || 0) + 1; });
+            if (genderChart) genderChart.destroy();
+            genderChart = new Chart(document.getElementById('genderChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(counts),
+                    datasets: [{ data: Object.values(counts), backgroundColor: ['#0e5774', '#E1AD01', '#cbd5e1'] }]
+                },
+                options: { maintainAspectRatio: false }
+            });
+        }
+
+        function toggleCollapse() {
+            const content = document.getElementById('candidateData');
+            const arrow = document.getElementById('arrow');
+            content.classList.toggle('active');
+            arrow.innerText = content.classList.contains('active') ? '▲' : '▼';
+        }
+
+        function openModal(idx) {
+            const r = masterData[idx];
+            document.getElementById('mName').innerText = r[2];
+            const fields = [
+                {l:"Contact", v:r[6]}, {l:"Email", v:r[8]},
+                {l:"Place", v:r[10]}, {l:"Qualification", v:r[15]},
+                {l:"Experience", v:r[21]}, {l:"Salary Expected", v:r[23]},
+                {l:"Preferred Sector", v:r[25]}, {l:"PWD Status", v:r[29]}
+            ];
+            document.getElementById('mDetails').innerHTML = fields.map(f => `
+                <div class="detail-item"><label>${f.l}</label><p>${f.v || 'N/A'}</p></div>
+            `).join('');
+            document.getElementById('drillDownModal').style.display = 'block';
+        }
+
+        function closeModal() { document.getElementById('drillDownModal').style.display = 'none'; }
+
+        refreshDashboard();
+        setInterval(refreshDashboard, 60000);
+    </script>
+</body>
+</html>
