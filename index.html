@@ -154,7 +154,6 @@
 
         .collapse-content.active { display: block; }
 
-        /* Highlight for Experienced Candidates */
         .highlight-row { background-color: #fff9c4 !important; }
         
         tr.clickable-row:hover {
@@ -261,6 +260,7 @@
         const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7yGVpCvEDWTV3-qKLCmnb_n5AO-wgu1-SjRZ7M5QbohrI2uy77q9qCwxGwwDV11HSebe146TZUeC-/pub?output=csv";
         let genderChart, masterData;
 
+        // Custom Regex Parser to handle commas inside quoted cells
         function parseCSV(text) {
             return text.split('\n').slice(1).filter(l => l.trim()).map(line => {
                 const res = []; let cell = '', inQuotes = false;
@@ -274,18 +274,24 @@
         }
 
         async function refreshDashboard() {
-            const res = await fetch(`${CSV_URL}&t=${new Date().getTime()}`);
-            const data = parseCSV(await res.text());
-            masterData = data;
-            
-            document.getElementById('totalReg').innerText = data.length;
-            document.getElementById('attendCount').innerText = data.filter(r => r[31] && r[31].includes("PRESENT")).length;
-            document.getElementById('expCount').innerText = data.filter(r => r[19] === "Experienced").length;
-            document.getElementById('pwdCount').innerText = data.filter(r => r[29] === "Yes").length;
+            try {
+                // Cache-busting ensures the dashboard sees your 701+ entries immediately
+                const res = await fetch(`${CSV_URL}&t=${new Date().getTime()}`);
+                const data = parseCSV(await res.text());
+                masterData = data;
+                
+                document.getElementById('totalReg').innerText = data.length;
+                
+                // FIXED: Index 34 is Column AI (Attendance Status)
+                document.getElementById('attendCount').innerText = data.filter(r => r[34] && r[34].includes("PRESENT")).length;
+                
+                document.getElementById('expCount').innerText = data.filter(r => r[19] === "Experienced").length;
+                document.getElementById('pwdCount').innerText = data.filter(r => r[29] === "Yes").length;
 
-            renderDistrictTable(data);
-            renderMasterTable(data);
-            renderGenderChart(data);
+                renderDistrictTable(data);
+                renderMasterTable(data);
+                renderGenderChart(data);
+            } catch (err) { console.error("Sync Failure", err); }
         }
 
         function renderDistrictTable(data) {
@@ -339,9 +345,8 @@
             document.getElementById('mName').innerText = r[2];
             const fields = [
                 {l:"Contact", v:r[6]}, {l:"Email", v:r[8]},
-                {l:"Place", v:r[10]}, {l:"Qualification", v:r[15]},
-                {l:"Experience", v:r[21]}, {l:"Salary Expected", v:r[23]},
-                {l:"Preferred Sector", v:r[25]}, {l:"PWD Status", v:r[29]}
+                {l:"Place", v:r[10]}, {l:"District", v:r[13]},
+                {l:"Status", v:r[34] || "PENDING"}
             ];
             document.getElementById('mDetails').innerHTML = fields.map(f => `
                 <div class="detail-item"><label>${f.l}</label><p>${f.v || 'N/A'}</p></div>
@@ -352,6 +357,7 @@
         function closeModal() { document.getElementById('drillDownModal').style.display = 'none'; }
 
         refreshDashboard();
+        // Background sync every 60 seconds
         setInterval(refreshDashboard, 60000);
     </script>
 </body>
