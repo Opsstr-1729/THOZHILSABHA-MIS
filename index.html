@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KASE Executive MIS | 2026 Strategic Overview</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
     <style>
         :root { 
             --consultancy-teal: #0e5774; 
@@ -16,7 +18,7 @@
             --muted-slate: #64748b;
             --border-light: #e2e8f0;
             --font-serif: 'Playfair Display', serif;
-            --font-sans: 'Montserrat', sans-serif;
+            --font-sans: 'Inter', sans-serif;
         }
 
         body { 
@@ -26,9 +28,10 @@
             padding: 40px; 
             color: var(--ink-black);
             line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Executive Header Section */
+        /* Executive Header */
         header { 
             margin-bottom: 50px; 
             border-left: 6px solid var(--consultancy-teal);
@@ -53,10 +56,10 @@
             margin-top: 5px;
         }
 
-        /* Analytics Grid */
+        /* High-Value Analytics Cards */
         .analytics-grid { 
             display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
             gap: 25px; 
             margin-bottom: 40px; 
         }
@@ -64,12 +67,9 @@
         .stat-card { 
             background: var(--pure-white); 
             padding: 30px; 
-            border-radius: 4px; /* Sharp corners for professional look */
+            border-radius: 4px;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04);
-            transition: transform 0.3s ease;
         }
-
-        .stat-card:hover { transform: translateY(-5px); }
 
         .stat-card h3 { 
             margin: 0; 
@@ -81,14 +81,14 @@
         }
 
         .stat-card .value { 
-            font-size: 2.5rem; 
+            font-size: 2.8rem; 
             font-weight: 800; 
             margin-top: 10px; 
             color: var(--ink-black); 
             font-family: var(--font-serif);
         }
 
-        /* Consultancy Search Interface */
+        /* Search Interface */
         .search-container { 
             background: var(--pure-white); 
             padding: 30px; 
@@ -115,7 +115,6 @@
             border-radius: 4px; 
             font-size: 1.1rem; 
             box-sizing: border-box; 
-            transition: all 0.3s ease; 
             font-family: var(--font-sans);
             background-color: var(--bg-off-white);
         }
@@ -127,7 +126,7 @@
             box-shadow: 0 0 0 4px rgba(225, 173, 1, 0.1); 
         }
 
-        /* Data Audit Table */
+        /* Audit Profile Table */
         .audit-section {
             background: var(--pure-white);
             box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
@@ -135,32 +134,21 @@
             overflow: hidden;
         }
 
-        .table-header-btn { 
-            width: 100%; 
+        .table-header { 
             background: var(--consultancy-teal); 
             color: white; 
             padding: 20px 30px; 
-            border: none; 
             font-family: var(--font-serif); 
             font-size: 1.4rem; 
             font-weight: 700; 
-            cursor: pointer; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
         }
 
-        .table-wrapper { 
-            overflow-x: auto;
-            display: block; /* Keeping it open for consultancy transparency */
-            max-height: 800px;
-        }
+        .table-wrapper { overflow-x: auto; max-height: 800px; }
 
-        table { 
-            width: 100%; 
-            border-collapse: collapse; 
-            min-width: 1000px; 
-        }
+        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
 
         th { 
             background: #f1f5f9; 
@@ -172,13 +160,11 @@
             font-weight: 800;
             letter-spacing: 0.1em;
             border-bottom: 2px solid var(--border-light);
+            position: sticky;
+            top: 0;
         }
 
-        td { 
-            padding: 18px 20px; 
-            border-bottom: 1px solid var(--border-light); 
-            font-size: 0.95rem; 
-        }
+        td { padding: 18px 20px; border-bottom: 1px solid var(--border-light); font-size: 0.95rem; }
 
         tr.clickable-row { transition: all 0.2s ease; }
         tr.clickable-row:hover { 
@@ -187,7 +173,7 @@
             box-shadow: inset 4px 0 0 var(--prestige-gold);
         }
 
-        /* Performance Badges */
+        /* Attendance Status Badges */
         .badge { 
             padding: 6px 14px; 
             border-radius: 2px; 
@@ -198,10 +184,8 @@
         }
         .v-present { background: #e2f2e9; color: #166534; }
         .v-absent { background: #fee2e2; color: #991b1b; }
-        .i-comp { background: var(--consultancy-teal); color: white; }
-        .i-pend { background: #fef9c3; color: #854d0e; }
 
-        /* Consultant's Drill-Down Modal */
+        /* Full Details Modal */
         .modal { 
             display: none; 
             position: fixed; 
@@ -232,67 +216,44 @@
             padding-bottom: 20px;
         }
 
-        .detail-grid { 
-            display: grid; 
-            grid-template-columns: 1fr 1fr 1fr; 
-            gap: 30px; 
-        }
-
-        .detail-item label { 
-            font-size: 0.65rem; 
-            color: var(--muted-slate); 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            display: block; 
-            margin-bottom: 8px; 
-            letter-spacing: 0.1em;
-        }
-
-        .detail-item p { 
-            margin: 0; 
-            font-size: 1.1rem; 
-            color: var(--ink-black); 
-            font-weight: 500; 
-        }
-
-        .close-x { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; cursor: pointer; color: var(--muted-slate); transition: color 0.3s; }
-        .close-x:hover { color: var(--ink-black); }
-
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 30px; }
+        .detail-item label { font-size: 0.65rem; color: var(--muted-slate); font-weight: 800; text-transform: uppercase; display: block; margin-bottom: 8px; }
+        .detail-item p { margin: 0; font-size: 1.1rem; color: var(--ink-black); font-weight: 500; }
+        .close-x { position: absolute; top: 30px; right: 40px; font-size: 2.5rem; cursor: pointer; color: var(--muted-slate); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>KASE Thozhilmela 2026</h1>
-        <div class="sub-header">Comphrehensive Report • 2026 </div>
+        <h1>KASE Operational MIS</h1>
+        <div class="sub-header">Executive Briefing • 2026 Venue Attendance</div>
     </header>
 
     <div class="analytics-grid">
-        <div class="stat-card"><h3>Total Registrations</h3><div class="value" id="totalReg">0</div></div>
-        <div class="stat-card"><h3>Venue Presence</h3><div class="value" id="venueCount">0</div></div>
+        <div class="stat-card"><h3>Total Registered</h3><div class="value" id="totalReg">0</div></div>
+        <div class="stat-card"><h3>Verified Present</h3><div class="value" id="venueCount">0</div></div>
         <div class="stat-card"><h3>Experienced Pool</h3><div class="value" id="expCount">0</div></div>
-        <div class="stat-card"><h3>Process Completion</h3><div class="value" id="compCount">0</div></div>
     </div>
 
     <div class="search-container">
-        <label class="search-label">Direct Candidate Identification</label>
-        <input type="text" id="searchInput" class="search-input" placeholder="Query Registration ID or Candidate Full Name and press Enter..." onkeyup="handleSearch(event)">
+        <label class="search-label">Candidate Identification Tool</label>
+        <input type="text" id="searchInput" class="search-input" placeholder="Search Registration ID or Full Name and press Enter..." onkeyup="handleSearch(event)">
     </div>
 
     <div class="audit-section">
-        <div class="table-header-btn">
-            <span>Registered Candidate List</span>
-            <span id="syncIndicator" style="font-size: 0.7rem; font-family: var(--font-sans); color: #fff; opacity: 0.8;">● LIVE SYSTEM SYNC ACTIVE</span>
+        <div class="table-header">
+            <span>Registered Candidates Audit</span>
+            <span id="syncIndicator" style="font-size: 0.7rem; font-family: var(--font-sans); opacity: 0.8;">● LIVE SYSTEM SYNC ACTIVE</span>
         </div>
         <div class="table-wrapper">
             <table id="masterTable">
                 <thead>
                     <tr>
-                        <th>ID Reference</th>
+                        <th>Registration ID</th>
                         <th>Full Name</th>
-                        <th>Origin District</th>
-                        <th>Attendance Status</th>
-                        <th>Interview Status</th>
+                        <th>District</th>
+                        <th>Qualification</th>
+                        <th>Venue Attendance</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
@@ -303,19 +264,14 @@
     <div id="drillDownModal" class="modal" onclick="closeModal()">
         <div class="modal-content" onclick="event.stopPropagation()">
             <span class="close-x" onclick="closeModal()">&times;</span>
-            <div class="modal-title" id="mName">Candidate Profile</div>
+            <div class="modal-title" id="mName">Candidate Detail Report</div>
             <div class="detail-grid" id="mDetails"></div>
-            <div style="margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; font-size: 0.7rem; color: #94a3b8; text-transform: uppercase;">
-                Internal Document • Not for Public Distribution
-            </div>
         </div>
     </div>
 
     <script>
-        const REG_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7yGVpCvEDWTV3-qKLCmnb_n5AO-wgu1-SjRZ7M5QbohrI2uy77q9qCwxGwwDV11HSebe146TZUeC-/pub?output=csv";
-        const INT_URL = REG_URL; 
-        
-        let masterData = [], interviewMap = {};
+        const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vR7yGVpCvEDWTV3-qKLCmnb_n5AO-wgu1-SjRZ7M5QbohrI2uy77q9qCwxGwwDV11HSebe146TZUeC-/pub?output=csv";
+        let masterData = [];
 
         function parseCSV(text) {
             return text.split('\n').slice(1).filter(l => l.trim()).map(line => {
@@ -331,63 +287,45 @@
 
         async function refreshDashboard() {
             try {
-                const [regRes, intRes] = await Promise.all([
-                    fetch(`${REG_URL}&t=${Date.now()}`),
-                    fetch(`${INT_URL}&t=${Date.now()}`)
-                ]);
-                
-                masterData = parseCSV(await regRes.text());
-                const intData = parseCSV(await intRes.text());
-                
-                interviewMap = {};
-                intData.forEach(row => {
-                    const id = row[1]; 
-                    const status = row[8]; 
-                    if(!interviewMap[id] || status === "Completed") interviewMap[id] = status;
-                });
-
+                const res = await fetch(`${CSV_URL}&t=${Date.now()}`);
+                masterData = parseCSV(await res.text());
                 updateDashboard();
-            } catch (err) { console.error("Consultancy Sync Failure", err); }
+            } catch (err) { console.error("MIS Sync Failure", err); }
         }
 
         function updateDashboard() {
+            // Index 34 is Column AI for Venue Attendance
             const venuePresent = masterData.filter(r => r[34] && r[34].includes("PRESENT"));
             document.getElementById('totalReg').innerText = masterData.length;
             document.getElementById('venueCount').innerText = venuePresent.length;
             document.getElementById('expCount').innerText = masterData.filter(r => r[19] === "Experienced").length;
-            document.getElementById('compCount').innerText = masterData.filter(r => interviewMap[r[0]] === "Completed").length;
-
             renderTable(masterData);
         }
 
         function renderTable(data) {
             document.getElementById('tableBody').innerHTML = data.map((row, idx) => {
                 const isPresent = row[34] && row[34].includes("PRESENT");
-                const vText = isPresent ? "PRESENT" : "ABSENT";
+                const vText = isPresent ? "PRESENT AT VENUE" : "ABSENT";
                 const vClass = isPresent ? "v-present" : "v-absent";
-                const intStat = interviewMap[row[0]] === "Completed" ? "SUCCESSFUL" : "Incomplete";
-                const iClass = intStat === "SUCCESSFUL" ? "i-comp" : "i-pend";
                 
                 return `<tr class="clickable-row" onclick="openModal(${idx})">
                     <td style="font-weight:700; color:var(--consultancy-teal);">${row[0]}</td>
                     <td style="font-weight:600;">${row[2]}</td>
                     <td>${row[13]}</td>
+                    <td>${row[15]}</td>
                     <td><span class="badge ${vClass}">${vText}</span></td>
-                    <td><span class="badge ${iClass}">${intStat}</span></td>
                 </tr>`;
             }).join('');
         }
 
         function handleSearch(e) {
             const query = e.target.value.toLowerCase();
-            if (query === "") {
-                renderTable(masterData);
-                return;
-            }
             const filtered = masterData.filter(r => r[0].toLowerCase().includes(query) || r[2].toLowerCase().includes(query));
             renderTable(filtered);
             if (e.key === "Enter" && filtered.length > 0) {
-                openModal(masterData.indexOf(filtered[0]));
+                // Find index of the first filtered result in masterData
+                const originalIndex = masterData.findIndex(r => r[0] === filtered[0][0]);
+                openModal(originalIndex);
             }
         }
 
@@ -396,17 +334,14 @@
             document.getElementById('mName').innerText = r[2];
             
             const fields = [
-                {l: "Project ID", v: r[0]},
-                {l: "Primary Contact", v: r[6]},
-                {l: "Messaging Port", v: r[7]},
-                {l: "Corporate Email", v: r[8]},
-                {l: "Origin", v: r[13]},
+                {l: "Registration ID", v: r[0]},
+                {l: "Contact Number", v: r[6]},
+                {l: "WhatsApp", v: r[7]},
+                {l: "Email Address", v: r[8]},
+                {l: "Origin District", v: r[13]},
                 {l: "Highest Credential", v: r[15]},
-                {l: "Core Competency", v: r[16]},
-                {l: "Salary Benchmark", v: r[23]},
-                {l: "Employment Pool", v: r[19]},
-                {l: "Venue Analytics", v: r[34] || "PENDING LOG"},
-                {l: "Final Status", v: interviewMap[r[0]] || "PROCESS INITIATED"}
+                {l: "Employment Status", v: r[19]},
+                {l: "Venue Logistics", v: r[34] || "PENDING"}
             ];
             
             document.getElementById('mDetails').innerHTML = fields.map(f => `
@@ -418,7 +353,7 @@
         function closeModal() { document.getElementById('drillDownModal').style.display = 'none'; }
 
         refreshDashboard();
-        setInterval(refreshDashboard, 60000); // 1-minute audit sync
+        setInterval(refreshDashboard, 60000);
     </script>
 </body>
 </html>
